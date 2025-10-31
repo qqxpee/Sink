@@ -8,8 +8,10 @@ export default eventHandler(async (event) => {
   const { homeURL, linkCacheTtl, redirectWithQuery, caseSensitive } = useRuntimeConfig(event)
   const { cloudflare } = event.context
 
-  if (event.path === '/' && homeURL)
-    return sendRedirect(event, homeURL)
+  // if (event.path === '/' && homeURL)
+  //   return sendRedirect(event, homeURL)
+  if (event.path === '/')
+    return sendRedirect(event, '/dashboard')
 
   if (slug && !reserveSlug.includes(slug) && slugRegex.test(slug) && cloudflare) {
     const { KV } = cloudflare.env
@@ -37,6 +39,7 @@ export default eventHandler(async (event) => {
         console.error('Failed write access log:', error)
       }
       const target = redirectWithQuery ? withQuery(link.url, getQuery(event)) : link.url
+      setResponseHeader(event, 'Access-Control-Allow-Origin', '*')
       return sendRedirect(event, target, +useRuntimeConfig(event).redirectStatusCode)
     }
   }
